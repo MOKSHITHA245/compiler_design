@@ -12,26 +12,19 @@ void yyerror(const char *s);
 
 %%
 
-input:
-    expr '\n'
-    {
-        printf("Computed Result = %d\n", $1);
-    }
-    ;
-
-expr:
-      expr '+' expr
-    {
-        $$ = $1 + $3;
-    }
+expr
+    : expr '+' expr
+      {
+          $$ = $1 + $3;
+      }
     | expr '*' expr
-    {
-        $$ = $1 * $3;
-    }
+      {
+          $$ = $1 * $3;
+      }
     | NUMBER
-    {
-        $$ = $1;
-    }
+      {
+          $$ = $1;
+      }
     ;
 
 %%
@@ -39,23 +32,26 @@ expr:
 int yylex(void)
 {
     int c;
+    int value;
 
     while ((c = getchar()) == ' ' || c == '\t')
         ;
 
     if (c >= '0' && c <= '9')
     {
-        int value = 0;
+        value = 0;
 
-        do
+        while (c >= '0' && c <= '9')
         {
             value = value * 10 + (c - '0');
             c = getchar();
         }
-        while (c >= '0' && c <= '9');
 
         yylval = value;
-        ungetc(c, stdin);
+
+        if (c != EOF)
+            ungetc(c, stdin);
+
         return NUMBER;
     }
 
@@ -69,7 +65,13 @@ void yyerror(const char *s)
 
 int main(void)
 {
+    int result;
+
     printf("Enter expression: ");
-    yyparse();
+    result = yyparse();
+
+    if (result == 0)
+        printf("Expression evaluated successfully.\n");
+
     return 0;
 }
