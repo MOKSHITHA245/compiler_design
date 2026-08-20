@@ -12,6 +12,13 @@ void yyerror(const char *s);
 
 %%
 
+input
+    : expr
+      {
+          printf("Computed Result = %d\n", $1);
+      }
+    ;
+
 expr
     : expr '+' expr
       {
@@ -65,13 +72,7 @@ void yyerror(const char *s)
 
 int main(void)
 {
-    int result;
-
     printf("Enter expression: ");
-    result = yyparse();
-
-    if (result == 0)
-        printf("Expression evaluated successfully.\n");
-
+    yyparse();
     return 0;
 }
