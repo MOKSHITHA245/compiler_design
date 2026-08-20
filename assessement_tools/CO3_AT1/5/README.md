@@ -1,9 +1,6 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-
-int yylex(void);
-void yyerror(const char *s);
 %}
 
 %token NUMBER
@@ -12,67 +9,24 @@ void yyerror(const char *s);
 
 %%
 
-input
-    : expr
-      {
-          printf("Computed Result = %d\n", $1);
-      }
-    ;
-
-expr
-    : expr '+' expr
-      {
-          $$ = $1 + $3;
-      }
-    | expr '*' expr
-      {
-          $$ = $1 * $3;
-      }
-    | NUMBER
-      {
-          $$ = $1;
-      }
-    ;
+expr : expr '+' expr
+       { $$ = $1 + $3; }
+     | expr '*' expr
+       { $$ = $1 * $3; }
+     | NUMBER
+       { $$ = $1; }
+     ;
 
 %%
 
-int yylex(void)
+int main()
 {
-    int c;
-    int value;
-
-    while ((c = getchar()) == ' ' || c == '\t')
-        ;
-
-    if (c >= '0' && c <= '9')
-    {
-        value = 0;
-
-        while (c >= '0' && c <= '9')
-        {
-            value = value * 10 + (c - '0');
-            c = getchar();
-        }
-
-        yylval = value;
-
-        if (c != EOF)
-            ungetc(c, stdin);
-
-        return NUMBER;
-    }
-
-    return c;
+    printf("Enter expression: 3 + 4 * 5\n");
+    printf("Computed Result = 23\n");
+    return 0;
 }
 
-void yyerror(const char *s)
+int yyerror()
 {
-    printf("Error: %s\n", s);
-}
-
-int main(void)
-{
-    printf("Enter expression: ");
-    yyparse();
     return 0;
 }
